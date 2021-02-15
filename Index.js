@@ -1,16 +1,21 @@
+const fs = require('fs');
 const Manager = require('./lib/Manager');
 const Engineer = require('./lib/Engineer');
 const Intern = require('./lib/Intern');
-const generatePage = require('./src/generatePage');
-const fs = require('fs');
+const generatePage = require('./src/page-template');
 const inquirer = require('inquirer');
 
 
-let managerData;
-const engineerArray = [];
-const internArray = [];
+const employees = [];
+
+
 
 const managerInput = () => {
+    console.log(`
+=====================
+Enter manager details
+=====================
+    `);
     return inquirer.prompt([{
                 type: 'input',
                 name: 'name',
@@ -63,41 +68,16 @@ const managerInput = () => {
                     }
                 }
             },
-            {
-                type: 'confirm',
-                name: 'confirmAddEmployee',
-                message: 'Would you like to add another employee?',
-                default: false
-            },
+
         ])
-        .then(employeeData => {
-            managerData = employeeData;
-            if (managerData.confirmAddEmployee) {
-                managerChoices();
-            } else {
-                generatePage(managerData);
-            }
+        .then(data => {
+            const manager = new Manager(data.name, data.id, data.email, data.officeNumber);
+            employees.push(manager);
+            return managerChoices();
+
         })
 };
 
-const managerChoices = () =>{
-    return inquirer
-    .prompt([{
-        type: 'list',
-        name: 'employeeType',
-        choices: ['Engineer', 'Intern', 'No']
-    }])
-    .then(managerChoices => {
-                        
-        if (managerChoices.employeeType === 'Engineer') {
-            return engineerQuestions();
-        } else if (managerChoices.employeeType === 'Intern') {
-            return internQuestions();
-        } else if (managerChoices.employeeType === 'No') {
-            generatePage(managerData, engineerArray, internArray);
-        }
-    });
-}
 
 const engineerQuestions = () => {
     return inquirer.prompt([{
@@ -153,9 +133,8 @@ const engineerQuestions = () => {
             }
         }
     ]).then(data => {
-        let engineer = new Engineer (data.name, data.id, data.email, data.github);
-        engineerArray.push(engineer);
-        console.log(engineerArray);
+        const engineer = new Engineer(data.name, data.id, data.email, data.github);
+        employees.push(engineer);
         return managerChoices();
     });
 }
@@ -203,22 +182,61 @@ const internQuestions = () => {
         {
             type: 'input',
             name: 'school',
-            message: "Enter your Intern's schoool username. (Required)",
+            message: "Enter your Intern's school. (Required)",
             validate: nameInput => {
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log("Please enter your Intern's schoool username!");
+                    console.log("Please enter your Intern's school!");
                     return false;
                 }
             }
         }
     ]).then(data => {
-        let intern = new Intern (data.name, data.id, data.email, data.school);
-        internArray.push(intern);
-        console.log(internArray);
+        const intern = new Intern(data.name, data.id, data.email, data.school);
+        employees.push(intern);
         return managerChoices();
     });
 }
+
+
+const managerChoices = () => {
+    console.log(`
+    =======================
+    Choose an employee type
+    =======================
+        `);
+        return inquirer
+            .prompt([{
+                type: 'list',
+                name: 'employeeType',
+                message: 'Would you like to add another employee?',
+                choices: ['Engineer', 'Intern', 'None']
+            }])
+            .then(managerChoices => {
+    
+                if (managerChoices.employeeType === 'Engineer') {
+                    return engineerQuestions();
+                } else if (managerChoices.employeeType === 'Intern') {
+                    return internQuestions();
+                } else if (managerChoices.employeeType === 'None') {
+                    renderPage();
+
+                }
+            })
+    }
+
+
+const renderPage = (fileName) => {
+    fileName = fs.writeFile('./dist/index.html', generatePage(employees), err => {
+        if (err) {
+            console.log("Error: ", err)
+            return;
+        } else {
+            console.log("Profile generation successfull!");
+        }
+    });
+};
+
 
 managerInput();
