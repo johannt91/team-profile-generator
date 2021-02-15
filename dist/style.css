@@ -1,0 +1,30 @@
+.jumbotron {
+    margin-bottom: 50px;
+}
+
+h1 {
+    font-size: 3.2vw;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+
+}
+
+.card {
+    width: 275px;
+    margin-left: 25px;
+}
+
+span {
+    font-weight: bolder;
+    text-decoration: underline;
+}
