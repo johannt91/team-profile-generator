@@ -9,7 +9,7 @@ const inquirer = require('inquirer');
 const employees = [];
 
 
-
+//===== MANAGER INPUT =====//
 const managerInput = () => {
     console.log(`
 =====================
@@ -78,7 +78,7 @@ Enter manager details
         })
 };
 
-
+//===== ENGINEER QUESTIONS =====//
 const engineerQuestions = () => {
     return inquirer.prompt([{
             type: 'input',
@@ -139,6 +139,7 @@ const engineerQuestions = () => {
     });
 }
 
+//===== INTERN QUESTIONS =====//
 const internQuestions = () => {
     return inquirer.prompt([{
             type: 'input',
@@ -199,7 +200,7 @@ const internQuestions = () => {
     });
 }
 
-
+//===== EMPLOYEE TYPES CHOICES =====//
 const managerChoices = () => {
     console.log(`
     =======================
@@ -226,7 +227,7 @@ const managerChoices = () => {
             })
     }
 
-
+//===== RENDER HTML PAGE =====//
 const renderPage = (fileName) => {
     fileName = fs.writeFile('./dist/index.html', generatePage(employees), err => {
         if (err) {
